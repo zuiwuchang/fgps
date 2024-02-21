@@ -59,6 +59,17 @@ class _MyGPSPageState extends State<MyGPSPage> {
   }
 
   _clear() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => const MyConfirmDialog(
+        title: Text("Clear"),
+        child: Text("Clear all gps"),
+      ),
+    );
+    if (result != true) {
+      return;
+    }
+
     setState(() {
       _isDelete = true;
     });
