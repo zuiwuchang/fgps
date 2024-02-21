@@ -16,7 +16,7 @@ class MyGPS {
   int get id => gps.id;
   String get latitude => gps.latitude;
   String get longitude => gps.longitude;
-  String get text => '$latitude,$longitude';
+  String get text => '$latitude, $longitude';
 }
 
 class MyGPSPage extends StatefulWidget {
@@ -55,6 +55,25 @@ class _MyGPSPageState extends State<MyGPSPage> {
         _error = e;
         _isInit = false;
       });
+    }
+  }
+
+  _clear() async {
+    setState(() {
+      _isDelete = true;
+    });
+    try {
+      final helpers = await DB.helpers;
+      await helpers.gps.clear(widget.place.id);
+      setState(() {
+        _items!.clear();
+        _isDelete = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isDelete = false;
+      });
+      showErrorDialog(context, e);
     }
   }
 
@@ -153,6 +172,15 @@ class _MyGPSPageState extends State<MyGPSPage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.place.name),
+        actions: items.length == 0
+            ? null
+            : [
+                IconButton(
+                  icon: const Icon(Icons.delete_forever),
+                  tooltip: 'clear',
+                  onPressed: _disabled ? null : _clear,
+                ),
+              ],
       ),
       body: ListView.builder(
         itemCount: items.length,
